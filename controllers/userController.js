@@ -14,7 +14,7 @@ module.exports = {
         if (user.length >= 1) {
           // send an error and let the user know that the email already exists
           return res.status(409).json({
-            message: "email already exists"
+            message: "a user with this username already exists"
           });
           // if we don't have this user's email in our db, lets get them set up!
         } else {
@@ -29,6 +29,8 @@ module.exports = {
               db.User.create(
                 {
                   email: req.body.email,
+                  username: req.body.username,
+                  currentCity: req.body.currentCity,
                   password: hash
                 },
                 { password: 0 },
@@ -59,7 +61,7 @@ module.exports = {
     console.log("LOGIN CALLED");
     // find the user in our user db
     console.log("body", req.body);
-    db.User.find({ email: req.body.email })
+    db.User.find({ email: req.body.username })
       .select("+password")
       .exec()
       // if we have found a user
@@ -68,7 +70,7 @@ module.exports = {
         console.log("USERS: ", users);
         if (users.length < 1) {
           return res.status(401).json({
-            message: "Email/Password incorrect"
+            message: "Username/Password incorrect"
           });
         }
         // we have an email in our db that matches what they gave us
@@ -89,7 +91,7 @@ module.exports = {
             const token = jwt.sign(
               {
                 // add some identifying information
-                email: users[0].email,
+                username: users[0].username,
                 _id: users[0]._id
               },
               // add our super secret key (which should be hidden, not plaintext like this)
