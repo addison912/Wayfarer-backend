@@ -1,12 +1,12 @@
 const mongoose = require("../models/User"),
   bcrypt = require("bcrypt"),
   db = require("../models"),
-  jwt = require("jsonwebtoken");
+  jwt = require("jsonwebtoken"),
+  config = require("../config/config");
 
 module.exports = {
   signup: (req, res) => {
     console.log(req.body);
-    // Check to see if email is already in db
     db.User.find({ username: req.body.username })
       .exec()
       .then(user => {
@@ -16,16 +16,13 @@ module.exports = {
           return res.status(409).json({
             message: "a user with this username already exists"
           });
-          // if we don't have this user's email in our db, lets get them set up!
+          // if user's email not in our db, lets get them set up!
         } else {
-          // lets hash our plaintext password
           bcrypt.hash(req.body.password, 10, (err, hash) => {
             if (err) {
               console.log("hashing error:", err);
               res.status(200).json({ error: err });
-              // we now have a successful hashed password
             } else {
-              // we are creating a User object with their email address and OUR hashed password
               db.User.create(
                 {
                   email: req.body.email,
@@ -57,11 +54,12 @@ module.exports = {
         res.status(500).json({ err });
       });
   },
+
   login: (req, res) => {
     console.log("LOGIN CALLED");
     // find the user in our user db
     console.log("body", req.body);
-    db.User.find({ email: req.body.username })
+    db.User.find({ username: req.body.username })
       .select("+password")
       .exec()
       // if we have found a user
@@ -73,32 +71,27 @@ module.exports = {
             message: "Username/Password incorrect"
           });
         }
-        // we have an email in our db that matches what they gave us
+        // we have a username in our db that matches what they gave us
         // now we have to compare their hashed password to what we have in our db
         console.log("body", req.body);
         console.log("hash", users[0].password);
         bcrypt.compare(req.body.password, users[0].password, (err, match) => {
           console.log(match);
-          // If the compare function breaks, let them know
           if (err) {
             console.log(err);
             return res.status(500).json({ err });
           }
-          // If match is true (their password matches our db password)
           if (match) {
             console.log("MATCH: ", match);
             // create a json web token
             const token = jwt.sign(
               {
-                // add some identifying information
                 username: users[0].username,
                 _id: users[0]._id
               },
-              // add our super secret key (which should be hidden, not plaintext like this)
-              "waffles",
-              // these are options, not necessary
+              //  secret key
+              config.jwtSecret,
               {
-                // its good practice to have an expiration amount for jwt tokens.
                 expiresIn: "1h"
               }
             );
@@ -111,7 +104,7 @@ module.exports = {
             // the password provided does not match the password on file.
           } else {
             console.log("NOT A MATCH");
-            res.status(401).json({ message: "Email/Password incorrect" });
+            res.status(401).json({ message: "Username/Password incorrect" });
           }
         });
       })
@@ -121,6 +114,7 @@ module.exports = {
         res.status(500).json({ err });
       });
   },
+
   delete: (req, res) => {
     console.log("hitting delete");
     db.User.deleteOne({ _id: req.params.userId }, (err, result) => {
