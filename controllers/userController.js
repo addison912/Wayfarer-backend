@@ -47,6 +47,7 @@ module.exports = {
                         jwt.sign(
                           { result },
                           config.jwtSecret,
+                          { expiresIn: "1h" },
                           (err, signedJwt) => {
                             res.status(200).json({
                               message: "User Created",
@@ -85,8 +86,6 @@ module.exports = {
             message: "Username/Password incorrect"
           });
         }
-        // we have a username in our db that matches what they gave us
-        // now we have to compare their hashed password to what we have in our db
         console.log("body", req.body);
         console.log("hash", user.password);
         bcrypt.compare(req.body.password, user.password, (err, match) => {
@@ -100,11 +99,9 @@ module.exports = {
             // create a json web token
             const token = jwt.sign(
               {
-                // add some identifying information
                 username: user.username,
                 _id: user._id
               },
-              //  secret key
               config.jwtSecret,
               {
                 expiresIn: "1h"
@@ -114,6 +111,7 @@ module.exports = {
             // send success back to user, along with a token.
             return res.status(200).json({
               message: "Auth successful",
+              _id: user._id,
               token
             });
             // the password provided does not match the password on file.
