@@ -6,48 +6,57 @@ const mongoose = require("../models/User"),
 module.exports = {
   signup: (req, res) => {
     console.log(req.body);
-    // Check to see if email is already in db
-    db.User.find({ username: req.body.username })
+    db.User.findOne({ username: req.body.username })
       .exec()
       .then(user => {
-        // if a user is found with that email
-        if (user.length >= 1) {
-          // send an error and let the user know that the email already exists
+        if (user) {
           return res.status(409).json({
-            message: "email already exists"
+            message: "There's already a user with that username"
           });
-          // if we don't have this user's email in our db, lets get them set up!
         } else {
-          // lets hash our plaintext password
-          bcrypt.hash(req.body.password, 10, (err, hash) => {
-            if (err) {
-              console.log("hashing error:", err);
-              res.status(200).json({ error: err });
-              // we now have a successful hashed password
-            } else {
-              // we are creating a User object with their email address and OUR hashed password
-              db.User.create(
-                {
-                  email: req.body.email,
-                  password: hash
-                },
-                { password: 0 },
-                (err, result) => {
-                  // if(err){ return res.status(500).json({err})}
-                  // we send our new data back to user or whatever you want to do.
-                  result = result[0];
-                  jwt.sign({ result }, "waffles", (err, signedJwt) => {
-                    res.status(200).json({
-                      message: "User Created",
-                      result,
-                      signedJwt
-                    });
-                  });
-                  // send success back to user, along with a token.
-                }
-              );
-            }
-          });
+          db.User.findOne({ email: req.body.email })
+            .exec()
+            .then(user => {
+              if (user) {
+                return res.status(409).json({
+                  message:
+                    "There's already a username associated with that email address"
+                });
+              } else {
+                bcrypt.hash(req.body.password, 10, (err, hash) => {
+                  if (err) {
+                    console.log("hashing error:", err);
+                    res.status(200).json({ error: err });
+                  } else {
+                    console.log("Creating user");
+                    db.User.create(
+                      {
+                        username: req.body.username,
+                        currentCity: req.body.currentCity,
+                        email: req.body.email,
+                        joinDate: req.body.joinDate,
+                        profilePic: req.body.profilePic,
+                        password: hash
+                      },
+                      { password: 0 },
+                      (err, result) => {
+                        // if(err){ return res.status(500).json({err})}
+                        // we send our new data back to user or whatever you want to do.
+                        // result = result[0];
+                        console.log("signing jwt");
+                        jwt.sign({ result }, "waffles", (err, signedJwt) => {
+                          res.status(200).json({
+                            message: "User Created",
+                            result,
+                            signedJwt
+                          });
+                        });
+                      }
+                    );
+                  }
+                });
+              }
+            });
         }
       })
       .catch(err => {
@@ -55,11 +64,12 @@ module.exports = {
         res.status(500).json({ err });
       });
   },
+
   login: (req, res) => {
     console.log("LOGIN CALLED");
     // find the user in our user db
     console.log("body", req.body);
-    db.User.find({ email: req.body.email })
+    db.User.find({ username: req.body.username })
       .select("+password")
       .exec()
       // if we have found a user
@@ -89,14 +99,13 @@ module.exports = {
             const token = jwt.sign(
               {
                 // add some identifying information
-                email: users[0].email,
+                username: users[0].user,
                 _id: users[0]._id
               },
               // add our super secret key (which should be hidden, not plaintext like this)
               "waffles",
               // these are options, not necessary
               {
-                // its good practice to have an expiration amount for jwt tokens.
                 expiresIn: "1h"
               }
             );
