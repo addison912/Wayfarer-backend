@@ -1,4 +1,4 @@
-const mongoose = require("../models/User"),
+const User = require("../models/User"),
   bcrypt = require("bcrypt"),
   db = require("../models"),
   jwt = require("jsonwebtoken"),
@@ -7,7 +7,7 @@ const mongoose = require("../models/User"),
 module.exports = {
   signup: (req, res) => {
     console.log(req.body);
-    db.User.findOne({ username: req.body.username })
+    User.findOne({ username: req.body.username })
       .exec()
       .then(user => {
         if (user) {
@@ -15,7 +15,7 @@ module.exports = {
             message: "There's already a user with that username"
           });
         } else {
-          db.User.findOne({ email: req.body.email })
+          User.findOne({ email: req.body.email })
             .exec()
             .then(user => {
               if (user) {
@@ -30,7 +30,7 @@ module.exports = {
                     res.status(200).json({ error: err });
                   } else {
                     console.log("Creating user");
-                    db.User.create(
+                    User.create(
                       {
                         username: req.body.username,
                         currentCity: req.body.currentCity,
@@ -39,7 +39,6 @@ module.exports = {
                         profilePic: req.body.profilePic,
                         password: hash
                       },
-                      { password: 0 },
                       (err, result) => {
                         // if(err){ return res.status(500).json({err})}
                         // we send our new data back to user or whatever you want to do.
@@ -49,6 +48,7 @@ module.exports = {
                         jwt.sign(
                           { result },
                           config.jwtSecret,
+                          { expiresIn: "1h" },
                           (err, signedJwt) => {
                             res.status(200).json({
                               message: "User Created",
@@ -75,7 +75,7 @@ module.exports = {
     console.log("LOGIN CALLED");
     // find the user in our user db
     console.log("body", req.body);
-    db.User.findOne({ username: req.body.username })
+    User.findOne({ username: req.body.username })
       .select("+password")
       .exec()
       // if we have found a user
@@ -87,8 +87,6 @@ module.exports = {
             message: "Username/Password incorrect"
           });
         }
-        // we have a username in our db that matches what they gave us
-        // now we have to compare their hashed password to what we have in our db
         console.log("body", req.body);
         console.log("hash", user.password);
         bcrypt.compare(req.body.password, user.password, (err, match) => {
@@ -102,11 +100,9 @@ module.exports = {
             // create a json web token
             const token = jwt.sign(
               {
-                // add some identifying information
                 username: user.username,
                 _id: user._id
               },
-              //  secret key
               config.jwtSecret,
               {
                 expiresIn: "1h"
@@ -116,6 +112,7 @@ module.exports = {
             // send success back to user, along with a token.
             return res.status(200).json({
               message: "Auth successful",
+              _id: user._id,
               token
             });
             // the password provided does not match the password on file.
@@ -134,7 +131,7 @@ module.exports = {
 
   delete: (req, res) => {
     console.log("hitting delete");
-    db.User.deleteOne({ _id: req.params.userId }, (err, result) => {
+    User.deleteOne({ _id: req.params.userId }, (err, result) => {
       if (err) {
         return res.status(500).json({ err });
       }
