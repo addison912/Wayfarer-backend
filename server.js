@@ -1,12 +1,14 @@
-const express = require("express");
-const bodyParser = require("body-parser");
-const passport = require("./config/passport")();
-const jwt = require("jsonwebtoken");
+const express = require("express"),
+  bodyParser = require("body-parser"),
+  passport = require("./config/passport")(),
+  jwt = require("jsonwebtoken"),
+  cors = require("cors");
 
 // generate a new express app and call it 'app'
 const app = express();
 
 // middleware
+app.use(cors());
 app.use(bodyParser.json());
 app.use(passport.initialize());
 app.use(express.static("public"));
