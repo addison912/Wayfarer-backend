@@ -45,6 +45,7 @@ module.exports = {
                         // we send our new data back to user or whatever you want to do.
                         // result = result[0];
                         console.log("signing jwt");
+                        console.log(result)
                         jwt.sign(
                           { result },
                           config.jwtSecret,

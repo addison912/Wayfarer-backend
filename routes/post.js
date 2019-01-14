@@ -4,6 +4,7 @@ const express = require("express"),
 
 
 
-router.get("/:userId", post.index);
+router.get("/:userId", post.userPosts);
+
 
 module.exports = router;

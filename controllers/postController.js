@@ -9,9 +9,9 @@ const db = require("../models")
 
 module.exports = {
 
-  index: (req,res) => {
-    console.log(req);
-    db.Post.find({ user: req.params.userId }, (err, result) => {
+  userPosts: (req,res) => {
+    console.log("hitting get posts");
+    db.Post.findOne({ user: req.params.userId }, (err, result) => {
       if (err) {
         return res.status(999).json({ err });
       }

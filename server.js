@@ -23,7 +23,7 @@ const commentRoutes = require("./routes/comment");
 app.use("/files", express.static("files"));
 app.use("/user", userRoutes);
 // app.use("/city", cityRoutes);
-// app.use("/post", postRoutes);
+app.use("/post", postRoutes);
 // app.use("/comment", commentRoutes);
 
 app.post("/verify", verifyToken, (req, res) => {
