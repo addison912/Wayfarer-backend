@@ -84,6 +84,7 @@ typings/
 .dynamodb/
 
 .DS_Store
+.uploads/*
 # End of https://www.gitignore.io/api/node
 
 
