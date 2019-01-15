@@ -48,6 +48,7 @@ module.exports = {
             return res.status(200).json({
               message: "Auth successful",
               _id: user._id,
+              user: user,
               token
             });
             // the password provided does not match the password on file.
