@@ -72,5 +72,22 @@ module.exports = {
       }
       res.status(200).json({ result });
     });
+  },
+
+
+  find: (req, res) => {
+    console.log("FIND USER CALLED");
+    User.findOne({ username: req.params.username })
+      .exec()
+      // if we have found a user
+      .then(user => {
+        console.log("USER: ", user);
+        if (user === null) {
+          return res.status(401).json({
+            message: "User not found"
+          });
+        }
+        return res.json({ user })
+      })
+    }
   }
-};

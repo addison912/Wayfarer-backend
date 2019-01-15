@@ -12,4 +12,6 @@ router.post("/create", post.create);
 
 router.get("/:userId", post.userPosts);
 
+
+
 module.exports = router;

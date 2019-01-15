@@ -100,4 +100,6 @@ router.post("/login", user.login);
 
 router.delete("/:userId", user.delete);
 
+router.get("/:username", user.find);
+
 module.exports = router;
