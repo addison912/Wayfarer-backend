@@ -32,7 +32,8 @@ const newUserPic = upload.fields([
 
 router.post("/signup", newUserPic, (req, res) => {
   console.log(req.body);
-  console.log(req.files);
+  console.log(req.files["profilePic"][0].path);
+  let imagePath = req.files["profilePic"][0].path;
   User.findOne({ username: req.body.username })
     .exec()
     .then(user => {
@@ -62,7 +63,7 @@ router.post("/signup", newUserPic, (req, res) => {
                       currentCity: req.body.currentCity,
                       email: req.body.email,
                       joinDate: req.body.joinDate,
-                      // profilePic: req.files["profilePic"][0],
+                      profilePic: imagePath,
                       password: hash
                     },
                     (err, result) => {
