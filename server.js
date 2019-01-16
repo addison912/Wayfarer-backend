@@ -21,6 +21,7 @@ const cityRoutes = require("./routes/city");
 const postRoutes = require("./routes/post");
 const commentRoutes = require("./routes/comment");
 app.use("/uploads", express.static("uploads"));
+app.use("/files", express.static("files"));
 app.use("/user", userRoutes);
 app.use("/city", cityRoutes);
 app.use("/post", postRoutes);
