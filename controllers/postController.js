@@ -36,6 +36,7 @@ module.exports = {
 
   userPosts: (req, res) => {
     console.log("hitting get posts");
+
     db.Post.find({ user: { _id: req.params.userId } }, (err, result) => {
       if (err) {
         return res.status(999).json({ err });
