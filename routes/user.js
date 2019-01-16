@@ -107,4 +107,6 @@ router.delete("/:userId", user.delete);
 
 router.get("/:username", user.find);
 
+router.get("/byid/:userId", user.findById);
+
 module.exports = router;

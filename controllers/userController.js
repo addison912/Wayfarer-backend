@@ -89,5 +89,21 @@ module.exports = {
         }
         return res.json({ user });
       });
+  },
+
+  findById: (req, res) => {
+    console.log("FIND USER CALLED");
+    User.findOne({ _id: req.params.userId })
+      .exec()
+      // if we have found a user
+      .then(user => {
+        console.log("USER: ", user);
+        if (user === null) {
+          return res.status(401).json({
+            message: "User not found"
+          });
+        }
+        return res.json({ user });
+      });
   }
 };
