@@ -10,8 +10,8 @@ router.post("/create", post.create);
 
 // router.delete("/:postId", post.delete);
 
-router.get("/:userId", post.userPosts);
+router.get("/user/:userId", post.userPosts);
 
-
+router.get("/bycity/:city", post.bycity);
 
 module.exports = router;

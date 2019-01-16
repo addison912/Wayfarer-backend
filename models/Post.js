@@ -5,6 +5,7 @@ const PostsSchema = new Schema({
   title: String,
   picture: String,
   body: String,
+  date: String,
   user: {
     type: Schema.Types.ObjectId,
     ref: "User"

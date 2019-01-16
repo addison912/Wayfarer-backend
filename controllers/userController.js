@@ -75,7 +75,6 @@ module.exports = {
     });
   },
 
-
   find: (req, res) => {
     console.log("FIND USER CALLED");
     User.findOne({ username: req.params.username })
@@ -88,7 +87,7 @@ module.exports = {
             message: "User not found"
           });
         }
-        return res.json({ user })
-      })
-    }
+        return res.json({ user });
+      });
   }
+};

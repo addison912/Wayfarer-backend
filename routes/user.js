@@ -32,8 +32,12 @@ const newUserPic = upload.fields([
 
 router.post("/signup", newUserPic, (req, res) => {
   console.log(req.body);
-  console.log(req.files["profilePic"][0].path);
-  let imagePath = req.files["profilePic"][0].path;
+  let imagePath;
+  if (req.files["profilePic"][0]) {
+    imagePath = req.files["profilePic"][0].path;
+  } else {
+    imagePath = "#";
+  }
   User.findOne({ username: req.body.username })
     .exec()
     .then(user => {
