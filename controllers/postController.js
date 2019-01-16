@@ -7,20 +7,30 @@ module.exports = {
     db.User.findOne({ username: req.body.username })
       .exec()
       .then(user => {
-        let newPost = new Post({
-          user: user,
-          title: req.body.title,
-          picture: req.body.picture,
-          body: req.body.body,
-          comments: []
-        });
-        newPost.save(function(err, post) {
-          if (err) {
-            return console.log("create error: " + err);
-          }
-          console.log("created a new post,", post.title);
-          res.json(post);
-        });
+        db.City.findOne({ city: req.body.city })
+          .exec()
+          .then(city => {
+            let newPost = new Post({
+              user: user,
+              city: city,
+              title: req.body.title,
+              picture: req.body.picture,
+              body: req.body.body,
+              comments: []
+            });
+            newPost.save(function(err, post) {
+              if (err) {
+                return console.log("create error: " + err);
+              }
+              console.log("created a new post,", post.title);
+              res.json(post);
+            });
+          })
+          .catch(err => {
+            console.log("City not found!");
+            console.log(err);
+            res.status(500).json({ err });
+          });
       });
   },
 
@@ -32,7 +42,20 @@ module.exports = {
       }
       res.status(200).json({ result });
     });
+  },
+
+  bycity: (req, res) => {
+    console.log("getting posts by city");
+    db.City.findOne({ city: req.params.city }, (err, city) => {
+      Post.find({ city: city._id }, (err, posts) => {
+        if (err) {
+          return res.status(999).json({ err });
+        }
+        res.status(200).json({ posts });
+      });
+      if (err) {
+        return res.status(420).json({ err });
+      }
+    });
   }
 };
-
-
