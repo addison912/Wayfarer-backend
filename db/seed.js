@@ -1,10 +1,19 @@
 const db = require("../models");
 
 let city_list = {
-  city: "Portland",
-  state: "Oregon",
-  country: "United States of America"
-};
+//   city: "Portland",
+//   state: "Oregon",
+//   country: "United States of America"
+//   img: 
+// };
+
+
+  city: "Oakland",
+  state: "California",
+  country: "United States of America",
+  image:
+    "http://photos.cinematreasures.org/production/photos/51984/1344729159/large.jpg?1344729159"
+}
 
 let user_list = [
   {
